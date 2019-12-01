@@ -4,7 +4,7 @@
   "description": "Opinionated Instagram scraper",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node main.ts",
+    "start": "ts-node ./src/main.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
