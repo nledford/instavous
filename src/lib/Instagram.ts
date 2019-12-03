@@ -54,7 +54,7 @@ const toDatedFolderPath = (unixTimestamp: number): string => {
     return path.join(year, month, day)
 }
 
-const downloadPostAsync = async (post: UserFeedResponseItemsItem, user: UserRepositoryInfoResponseUser, userDir: string) => {
+const downloadPostAsync = async (post: UserFeedResponseItemsItem, user: UserRepositoryInfoResponseUser, userDir: string, index: number, total: number) => {
     const isCarousel = post.carousel_media_count !== undefined
     const datedDir = Files.getDirectory(userDir, toDatedFolderPath(post.taken_at))
 
@@ -97,7 +97,7 @@ const downloadPostAsync = async (post: UserFeedResponseItemsItem, user: UserRepo
         await downloadMediaAsync(post, miscDir)
     }
     
-    // process.stdout.write(`Downloading post ${posts.indexOf(post) + 1} of ${posts.length}...\r`)
+    process.stdout.write(`Downloading post ${index} of ${total}...\r`)
 }
 
 const downloadMediaAsync = async (media: UserFeedResponseItemsItem, destDir: string) => {
@@ -164,15 +164,17 @@ export const downloadUserMediaAsync = async (client: IgApiClient, username: stri
     console.log(`Loading media for ${user.username}...`)
 
     const feed = client.feed.user(user.pk)
-    const posts = await feed.items()
     // const posts = await getAllItemsFromFeed(feed)
-    console.log(`Number of posts to download: ${posts.length}`)
+    const posts = await feed.items()
+    const total = posts.length
+    console.log(`Number of posts to download: ${total}`)
 
     // Download in parallel
     console.log(`\nBegan downloading at ${moment().format('HH:mm:ss')}...`)
+    let index = 1
     await Promise.all(
-        posts.map(async post => {
-            await downloadPostAsync(post, user, userDir)
+        posts.map(async (post) => {
+            await downloadPostAsync(post, user, userDir, index++, total)
         })
     )
 }
