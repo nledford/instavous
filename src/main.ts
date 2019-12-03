@@ -6,9 +6,7 @@ import moment from 'moment'
 
 import {downloadUserMediaAsync} from './lib/Instagram'
 
-console.log("Instavous\n")
-
-// set up constants
+// Constants
 const INSTAGRAM_USER = process.env.INSTAGRAM_USER
 const INSTAGRAM_PASSWORD = process.env.INSTAGRAM_PASSWORD
 
@@ -16,22 +14,6 @@ if (INSTAGRAM_USER === undefined || INSTAGRAM_PASSWORD === undefined) {
     console.log('No username and/or password provided')
     process.exit(1)
 }
-
-// const account = 'shanimarie_nsb'
-
-// const getUsername = async () => {
-//     const questions = [
-//         {
-//             type: 'input',
-//             name: 'username',
-//             message: 'Enter an Instagram username:'
-//         },
-//     ]
-
-//     const answers = await inquirer.prompt(questions)
-
-//     return ((answers as any).username as string).trim()
-// }
 
 const getDownloadConfig = async (): Promise<[string, boolean]> => {
     const questions = [
@@ -66,13 +48,13 @@ const getDownloadConfig = async (): Promise<[string, boolean]> => {
     return [username, skipVideos]
 }
 
-// create instagram client
+// START EXECUTION ************************************************************
+console.log("Instavous\n")
+
+// Create instagram client
 const ig = new IgApiClient()
 
-// shanimarie_nsb
-// monicapaulette
-
-// generate device id with username
+// Generate device id with username
 ig.state.generateDevice(INSTAGRAM_USER!);
 
 (async () => {
@@ -85,12 +67,12 @@ ig.state.generateDevice(INSTAGRAM_USER!);
     // Simulate post-login
     process.nextTick(async () => await ig.simulate.postLoginFlow())
 
-    // const username = await getUsername()
+    // Build download config from user input
     const downloadConfig = await getDownloadConfig()
     const username = downloadConfig[0]
     const skipVideos = downloadConfig[1]
 
-    // begin downloading user photos
+    // Download posts for provided username
     await downloadUserMediaAsync(ig, username, skipVideos)
 
     console.log(`\nFinished at ${moment(new Date()).format('HH:mm:ss')}!`)
