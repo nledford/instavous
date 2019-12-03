@@ -15,6 +15,7 @@
     "typescript": "^3.7.2"
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "dotenv": "^8.2.0",
     "empty-dir": "^2.0.0",
     "inquirer": "^7.0.0",
