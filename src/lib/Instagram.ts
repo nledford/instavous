@@ -174,8 +174,7 @@ export const downloadUserMediaAsync = async (client: IgApiClient, username: stri
     console.log(`Loading media for ${user.username}...`)
 
     const feed = client.feed.user(user.pk)
-    // const posts = await getAllItemsFromFeed(feed)
-    const posts = await feed.items()
+    const posts = await getAllItemsFromFeed(feed)
     const total = posts.length
     console.log(`Number of posts to download: ${total}`)
 
