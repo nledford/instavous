@@ -2,6 +2,7 @@ import fs from 'fs'
 import path from 'path'
 import url from 'url'
 
+import axios from 'axios'
 import emptyDir from 'empty-dir'
 import { IgApiClient, UserFeed } from 'instagram-private-api'
 import { 
@@ -19,6 +20,21 @@ enum InstaMediaType {
     Carousel = 8,
 }
 
+const deleteFoldersRecursive = (p: string): void => {
+    if (fs.existsSync(p)) {
+        fs.readdirSync(p).forEach((file, index) => {
+            var currPath = path.join(p, file)
+
+            if (fs.lstatSync(currPath).isDirectory()) {
+                deleteFoldersRecursive(currPath)
+            } else {
+                fs.unlinkSync(currPath)
+            }
+        })
+        fs.rmdirSync(p)
+    }
+}
+
 const getAllItemsFromFeed = async (feed: UserFeed): Promise<UserFeedResponseItemsItem[]> => {
     let items: UserFeedResponseItemsItem[] = []
     do {
@@ -31,7 +47,7 @@ const toDatedFolderPath = (unixTimestamp: number): string => {
     const date = moment.unix(unixTimestamp)
 
     const year = date.format('YYYY')
-    const month = date.format('MM')
+    const month = date.format('MM-MMM')
     const day = date.format('DD')
 
     return path.join(year, month, day)
@@ -45,7 +61,7 @@ const downloadMediaAsync = async (media: UserFeedResponseItemsItem, destDir: str
             mediaUrl = media.image_versions2.candidates[0].url
             break
         case InstaMediaType.Video:
-            mediaUrl = media.image_versions2[0].url
+            mediaUrl = media.video_versions![0].url
             break
         case InstaMediaType.Carousel:
             return
@@ -54,19 +70,38 @@ const downloadMediaAsync = async (media: UserFeedResponseItemsItem, destDir: str
     }
 
     let parsed = url.parse(mediaUrl)
-
     let takenAt = moment.unix(media.taken_at)
 
     await downloadFileAsync(parsed, media.user.username, takenAt, destDir)
 }
 
 const downloadFileAsync = async (url: url.UrlWithStringQuery, username: string, takenAt: moment.Moment, destDir: string) => {
-    console.log(url)
+    let filename = path.basename(url.pathname!)
+    filename = `${username}-${takenAt.format('YYYYMMDD')}-${filename}`
+
+    const fileDestPath = path.join(destDir, filename)
+
+    if (fs.existsSync(fileDestPath)) {
+        return
+    }
+
+    // download file
+    const writer = fs.createWriteStream(fileDestPath)
+    const response = await axios({
+        url: url.href,
+        method: 'GET',
+        responseType: 'stream',
+    })
+
+    response.data.pipe(writer)
+
+    return new Promise((resolve, reject) => {
+        writer.on('finish', resolve),
+        writer.on('error', reject)
+    })
 }
 
 export default class Instagram {
-    public posts: any[] = []
-
     public static async downloadUserMediaAsync(client: IgApiClient, username: string): Promise<void> {
         // Retrieve user information
         console.log(`Retriving info for ${username}...`)
@@ -75,6 +110,9 @@ export default class Instagram {
 
         // Build user directory
         const userDir = Files.getDirectory(Files.getUsersFolder(), username.charAt(0).toUpperCase(), username)
+
+        // clear out user directory if not empty
+        deleteFoldersRecursive(userDir)
 
         // Load media...
         console.log(`Loading media for ${user.username}...`)
@@ -113,7 +151,7 @@ export default class Instagram {
                             break
                         case InstaMediaType.Video:
                             // must cast `carouselItem` to `any` since `video_versions` field is not present in model
-                            parsedUrl = url.parse((carouselItem as any).video_versions.candidates[0].url) 
+                            parsedUrl = url.parse((carouselItem as any).video_versions![0].url) 
                             await downloadFileAsync(parsedUrl, user.username, takenAt, setDir)
                             break
                         case InstaMediaType.Carousel:
@@ -126,6 +164,8 @@ export default class Instagram {
                 const miscDir = Files.getDirectory(datedDir, 'Misc')
                 await downloadMediaAsync(post, miscDir)
             }
+            
+            process.stdout.write(`Downloading post ${posts.indexOf(post) + 1} of ${posts.length}...\r`)
         }
     }
 }
