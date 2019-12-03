@@ -30,7 +30,7 @@ const getUsername = async () => {
 
     const answers = await inquirer.prompt(questions)
 
-    return (answers as any).username
+    return ((answers as any).username as string).trim()
 }
 
 // create instagram client
