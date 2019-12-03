@@ -19,18 +19,51 @@ if (INSTAGRAM_USER === undefined || INSTAGRAM_PASSWORD === undefined) {
 
 // const account = 'shanimarie_nsb'
 
-const getUsername = async () => {
+// const getUsername = async () => {
+//     const questions = [
+//         {
+//             type: 'input',
+//             name: 'username',
+//             message: 'Enter an Instagram username:'
+//         },
+//     ]
+
+//     const answers = await inquirer.prompt(questions)
+
+//     return ((answers as any).username as string).trim()
+// }
+
+const getDownloadConfig = async (): Promise<[string, boolean]> => {
     const questions = [
         {
             type: 'input',
             name: 'username',
-            message: 'Enter an Instagram username:'
+            message: 'Enter an Instagram username',
+            validate: function(value: string) {
+                const pass = value.match(
+                    /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/igm
+                )
+                if (pass) {
+                    return true
+                }
+
+                return 'Please enter a valid Instagram username'
+            }
         },
+        {
+            type: 'confirm',
+            name: 'skipVideos',
+            message: 'Skip videos?',
+            default: true,
+        }
     ]
 
     const answers = await inquirer.prompt(questions)
 
-    return ((answers as any).username as string).trim()
+    const username = ((answers as any).username as string).trim()
+    const skipVideos = ((answers as any).skipVideos as boolean)
+
+    return [username, skipVideos]
 }
 
 // create instagram client
@@ -52,10 +85,13 @@ ig.state.generateDevice(INSTAGRAM_USER!);
     // Simulate post-login
     process.nextTick(async () => await ig.simulate.postLoginFlow())
 
-    const username = await getUsername()
+    // const username = await getUsername()
+    const downloadConfig = await getDownloadConfig()
+    const username = downloadConfig[0]
+    const skipVideos = downloadConfig[1]
 
     // begin downloading user photos
-    await downloadUserMediaAsync(ig, username)
+    await downloadUserMediaAsync(ig, username, skipVideos)
 
     console.log(`\nFinished at ${moment(new Date()).format('HH:mm:ss')}!`)
 })()

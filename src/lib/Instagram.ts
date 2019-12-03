@@ -54,7 +54,12 @@ const toDatedFolderPath = (unixTimestamp: number): string => {
     return path.join(year, month, day)
 }
 
-const downloadPostAsync = async (post: UserFeedResponseItemsItem, user: UserRepositoryInfoResponseUser, userDir: string, index: number, total: number) => {
+const downloadPostAsync = async (post: UserFeedResponseItemsItem, 
+                                 user: UserRepositoryInfoResponseUser,
+                                 userDir: string,
+                                 skipVideos: boolean,
+                                 index: number,
+                                 total: number) => {
     const isCarousel = post.carousel_media_count !== undefined
     const datedDir = Files.getDirectory(userDir, toDatedFolderPath(post.taken_at))
 
@@ -83,7 +88,12 @@ const downloadPostAsync = async (post: UserFeedResponseItemsItem, user: UserRepo
                     break
                 case InstaMediaType.Video:
                     // must cast `carouselItem` to `any` since `video_versions` field is not present in model
-                    parsedUrl = url.parse((carouselItem as any).video_versions![0].url) 
+                    parsedUrl = url.parse((carouselItem as any).video_versions![0].url)
+
+                    if (skipVideos) {
+                        break
+                    }
+
                     await downloadFileAsync(parsedUrl, user.username, takenAt, setDir)
                     break
                 case InstaMediaType.Carousel:
@@ -148,7 +158,7 @@ const downloadFileAsync = async (url: url.UrlWithStringQuery, username: string, 
     })
 }
 
-export const downloadUserMediaAsync = async (client: IgApiClient, username: string): Promise<void> => {
+export const downloadUserMediaAsync = async (client: IgApiClient, username: string, skipVideos: boolean = true): Promise<void> => {
     // Retrieve user information
     console.log(`Retriving info for ${username}...`)
     const userId = await client.user.getIdByUsername(username)
@@ -174,7 +184,7 @@ export const downloadUserMediaAsync = async (client: IgApiClient, username: stri
     let index = 1
     await Promise.all(
         posts.map(async (post) => {
-            await downloadPostAsync(post, user, userDir, index++, total)
+            await downloadPostAsync(post, user, userDir, skipVideos, index++, total)
         })
     )
 }
