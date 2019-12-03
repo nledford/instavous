@@ -4,7 +4,7 @@ import inquirer from 'inquirer'
 import { IgApiClient } from 'instagram-private-api'
 import moment from 'moment'
 
-import Instagram from './lib/Instagram'
+import {downloadUserMediaAsync} from './lib/Instagram'
 
 console.log("Instavous\n")
 
@@ -55,7 +55,7 @@ ig.state.generateDevice(INSTAGRAM_USER!);
     const username = await getUsername()
 
     // begin downloading user photos
-    await Instagram.downloadUserMediaAsync(ig, username)
+    await downloadUserMediaAsync(ig, username)
 
     console.log(`\nFinished at ${moment(new Date()).format()}`)
 })()

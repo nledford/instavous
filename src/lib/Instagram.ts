@@ -101,8 +101,7 @@ const downloadFileAsync = async (url: url.UrlWithStringQuery, username: string, 
     })
 }
 
-export default class Instagram {
-    public static async downloadUserMediaAsync(client: IgApiClient, username: string): Promise<void> {
+export const downloadUserMediaAsync = async (client: IgApiClient, username: string): Promise<void> => {
         // Retrieve user information
         console.log(`Retriving info for ${username}...`)
         const userId = await client.user.getIdByUsername(username)
@@ -168,4 +167,3 @@ export default class Instagram {
             process.stdout.write(`Downloading post ${posts.indexOf(post) + 1} of ${posts.length}...\r`)
         }
     }
-}
