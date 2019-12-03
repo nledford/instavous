@@ -11,11 +11,11 @@
     "@types/empty-dir": "^2.0.0",
     "@types/inquirer": "^6.5.0",
     "@types/node": "^12.12.14",
-    "dotenv": "^8.2.0",
     "ts-node": "^8.5.4",
     "typescript": "^3.7.2"
   },
   "dependencies": {
+    "dotenv": "^8.2.0",
     "empty-dir": "^2.0.0",
     "inquirer": "^7.0.0",
     "instagram-private-api": "^1.33.0",
