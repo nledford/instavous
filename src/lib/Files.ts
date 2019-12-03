@@ -4,7 +4,6 @@ import path from 'path'
 export default class Files {
     public static getAppFolder(): string {
         const dir = path.join('/', 'Instavous')
-        console.log(dir)
         return Files.getDirectory(dir)
     }
 
