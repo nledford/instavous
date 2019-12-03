@@ -1,11 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 
-import { getHomeFolder } from 'platform-folders'
-
 export default class Files {
     public static getAppFolder(): string {
-        const dir = path.join(getHomeFolder(), 'Instavous')
+        const dir = path.join('/', 'Instavous')
+        console.log(dir)
         return Files.getDirectory(dir)
     }
 

@@ -21,6 +21,5 @@
     "inquirer": "^7.0.0",
     "instagram-private-api": "^1.33.0",
     "moment": "^2.24.0",
-    "platform-folders": "^0.4.1"
   }
 }
