@@ -57,5 +57,5 @@ ig.state.generateDevice(INSTAGRAM_USER!);
     // begin downloading user photos
     await downloadUserMediaAsync(ig, username)
 
-    console.log(`\nFinished at ${moment(new Date()).format()}`)
+    console.log(`\nFinished at ${moment(new Date()).format('HH:mm:ss')}!`)
 })()
