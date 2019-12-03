@@ -3,10 +3,10 @@
 FROM alpine:latest AS base
 
 # Install node
-RUN apk add --no-cache g++ make nodejs-current npm python3
+RUN apk add --no-cache g++ make nodejs-current npm python python3
 
 # Install global node packages
-RUN npm i -g pnpm typescript ts-node
+RUN npm i -g typescript ts-node
 
 # Set working directory
 WORKDIR /root/instavous
@@ -22,7 +22,7 @@ FROM base AS dependencies
 RUN npm set progress=false && npm config set depth 0
 
 # Install all node_modules
-RUN pnpm install
+RUN npm i
 
 # RELEASE *********************************************************************
 
