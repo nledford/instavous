@@ -1,5 +1,7 @@
 build:
-	docker build -t instavous .
+	docker build -t nledford/instavous .
 
 run:
-	instavous
+	docker run \ 
+		--mount type=bind,source=/Users/nledford/Downloads/instavous,target=/Instavous \ 
+		nledford/instavous
