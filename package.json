@@ -10,8 +10,8 @@
   "devDependencies": {
     "@types/empty-dir": "^2.0.0",
     "@types/inquirer": "^6.5.0",
-    "@types/node": "^13.1.4",
-    "ts-node": "^8.5.4",
+    "@types/node": "^13.1.6",
+    "ts-node": "^8.6.0",
     "typescript": "^3.7.4"
   },
   "dependencies": {

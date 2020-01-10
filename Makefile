@@ -3,3 +3,6 @@ build:
 
 run:
 	docker run -it --mount type=bind,source=/Users/nledford/Downloads/instavous,target=/Instavous nledford/instavous
+
+update:
+	ncu -u && npm i
