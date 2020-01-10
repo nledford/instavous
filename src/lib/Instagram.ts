@@ -139,6 +139,7 @@ const downloadFileAsync = async (url: url.UrlWithStringQuery, username: string, 
     const fileDestPath = path.join(destDir, filename)
 
     if (fs.existsSync(fileDestPath)) {
+        console.log('File already exists. Skipping...')
         return
     }
 
@@ -168,7 +169,7 @@ export const downloadUserMediaAsync = async (client: IgApiClient, username: stri
     const userDir = Files.getDirectory(Files.getUsersFolder(), username.charAt(0).toUpperCase(), username)
 
     // clear out user directory if not empty
-    deleteFoldersRecursive(userDir)
+    // deleteFoldersRecursive(userDir)
 
     // Load media...
     console.log(`Loading media for ${user.username}...`)
