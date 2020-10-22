@@ -1,8 +1,8 @@
 require('dotenv').config()
 
-import inquirer from 'inquirer'
+import dayjs from 'dayjs'
+import * as inquirer from 'inquirer'
 import { IgApiClient } from 'instagram-private-api'
-import moment from 'moment'
 
 import {downloadUserMediaAsync} from './lib/Instagram'
 
@@ -75,5 +75,5 @@ ig.state.generateDevice(INSTAGRAM_USER!);
     // Download posts for provided username
     await downloadUserMediaAsync(ig, username, skipVideos)
 
-    console.log(`\nFinished at ${moment(new Date()).format('HH:mm:ss')}!`)
+    console.log(`\nFinished at ${dayjs(new Date()).format('HH:mm:ss')}!`)
 })()
