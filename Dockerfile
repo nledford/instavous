@@ -3,7 +3,7 @@
 FROM alpine:latest AS base
 
 # Install node
-RUN apk add --no-cache g++ make nodejs-current npm python python3
+RUN apk update && apk add --no-cache g++ make npm python python3
 
 # Install global node packages
 RUN npm i -g typescript ts-node
