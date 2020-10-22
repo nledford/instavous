@@ -3,6 +3,7 @@ import path from 'path'
 import url from 'url'
 
 import axios from 'axios'
+import dayjs from 'dayjs'
 import emptyDir from 'empty-dir'
 import { IgApiClient, UserFeed } from 'instagram-private-api'
 import { 
@@ -11,7 +12,6 @@ import {
     UserFeedResponseImage_versions2,
     UserRepositoryInfoResponseUser,
 } from 'instagram-private-api/dist/responses'
-import moment from 'moment'
 
 import Files from './Files'
 
@@ -45,7 +45,7 @@ const getAllItemsFromFeed = async (feed: UserFeed): Promise<UserFeedResponseItem
 }
 
 const toDatedFolderPath = (unixTimestamp: number): string => {
-    const date = moment.unix(unixTimestamp)
+    const date = dayjs.unix(unixTimestamp)
 
     const year = date.format('YYYY')
     const month = date.format('MM-MMM')
@@ -78,7 +78,7 @@ const downloadPostAsync = async (post: UserFeedResponseItemsItem,
 
         let carousel = post.carousel_media!
         for (const carouselItem of carousel) {
-            const takenAt = moment.unix(post.taken_at)
+            const takenAt = dayjs.unix(post.taken_at)
             let parsedUrl: url.UrlWithStringQuery
 
             switch(carouselItem.media_type) {
@@ -127,12 +127,12 @@ const downloadMediaAsync = async (media: UserFeedResponseItemsItem, destDir: str
     }
 
     let parsed = url.parse(mediaUrl)
-    let takenAt = moment.unix(media.taken_at)
+    let takenAt = dayjs.unix(media.taken_at)
 
     await downloadFileAsync(parsed, media.user.username, takenAt, destDir)
 }
 
-const downloadFileAsync = async (url: url.UrlWithStringQuery, username: string, takenAt: moment.Moment, destDir: string) => {
+const downloadFileAsync = async (url: url.UrlWithStringQuery, username: string, takenAt: dayjs.Dayjs, destDir: string) => {
     let filename = path.basename(url.pathname!)
     filename = `${username}-${takenAt.format('YYYYMMDD')}-${filename}`
 
@@ -180,7 +180,7 @@ export const downloadUserMediaAsync = async (client: IgApiClient, username: stri
     console.log(`Number of posts to download: ${total}`)
 
     // Download in parallel
-    console.log(`\nBegan downloading at ${moment().format('HH:mm:ss')}...`)
+    console.log(`\nBegan downloading at ${dayjs().format('HH:mm:ss')}...`)
     let index = 1
     await Promise.all(
         posts.map(async (post) => {
